@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<body>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+    }
+    header {
+        position: absolute;
+        width: 100%;
+        color: #eee;
+        padding: 0.5em;
+        font-size: 80%;
+        line-height: 2em;
+    }
+    header .link {
+        padding: 0 1em;
+        float: right;
+    }
+</style>
+<header>
+    <select id="characters"></select>
+    <select id="actions"><option value="">do...</option></select>
+    <label><input type="checkbox" id="loop" checked="true">loop</label>
+    <label><input type="checkbox" id="hitbox" checked="true">hitbox</label>
+    <a class="link" href="https://github.com/NSDN/th145pat2json">Source</a>
+</header>
+<script src="//cdn.bootcss.com/jquery/3.0.0-alpha1/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/phaser/2.4.4/phaser.min.js"></script>
+<script src="build/game.js"></script>
+<script>
+    var game = new MyGame.Game
+
+    $.get('res/characters.txt', function(text) {
+        var select = $('#characters'),
+            chars = text.split('\n')
+
+        if (location.search) {
+            chars.forEach(ch => {
+                ch && $('<option>' + ch + '</option>').appendTo(select)
+            })
+            select.val(location.search.replace(/\W/g, '') || '')
+                .change(function(e) { location.search = select.val() })
+        }
+        else {
+            location.search = chars[0]
+        }
+    })
+
+    $('#actions').change(function(e) {
+        var actor = game.state.getCurrentState().actor,
+            data = $(this).find('option:selected').data('val')
+        data && actor.sprites.playAnimations($('#loop').prop('checked') ? data : data.concat(null))
+    })
+
+    $('#hitbox').change(function(e) {
+        game.state.getCurrentState().actor.sprites.isHitboxVisible = $(this).prop('checked')
+    })
+
+    $(document).on('actor.load', function(e, info) {
+        info.anims.forEach(anim => {
+            $('<option></option>')
+                .text(anim.name + ' (' + anim.length + ')')
+                .data('val', [anim.name])
+                .appendTo('#actions')
+        })
+    })
+
+    console.log('Tip: use your arrow keys to control the character')
+</script>
+</body>
+</html>
