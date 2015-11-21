@@ -241,7 +241,7 @@ try {
     fs.writeFile(outFile, JSON.stringify(data, null, 2))
 }
 catch (e) {
-    throw e
     console.error('Error: died at ' + buf.currentOffset.toString(16) +
         ' (frame' + buf.currentFrameAddr.toString(16) + ', anim' + buf.currentAnimAddr.toString(16) + ')')
+    throw e
 }
